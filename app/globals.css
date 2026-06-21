@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-primary: #0f172a;
+  --color-brand: #2563eb;
+  --color-brand-dark: #1e40af;
+  --color-accent: #3b82f6;
+  --color-bg: #ffffff;
+  --color-border: #e2e8f0;
+  --color-text: #334155;
+  --color-muted: #64748b;
+  --font-sans: var(--font-inter);
+}
+
+body {
+  background: #ffffff;
+  color: var(--color-text);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 45%, #dbeafe 100%);
+}
