@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import { SITE_EMAIL, SITE_NAME } from "@/lib/constants";
+import { escapeHtml, getMailTransporter } from "@/lib/mail";
 
 export async function POST(req: Request) {
   try {
@@ -8,21 +8,33 @@ export async function POST(req: Request) {
     if (!body.name?.trim() || !body.email?.trim() || !body.message?.trim()) {
       return NextResponse.json({ error: "Name, email and message are required." }, { status: 400 });
     }
-    const key = process.env.RESEND_API_KEY;
-    if (!key) return NextResponse.json({ error: "Email service not configured." }, { status: 503 });
 
-    const resend = new Resend(key);
-    const from = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
-    const product = body.productName ? `<p><b>Product:</b> ${body.productName}</p>` : "";
-    const interest = body.researchInterest ? `<p><b>Research Interest:</b> ${body.researchInterest}</p>` : "";
+    const transporter = getMailTransporter();
+    if (!transporter) {
+      return NextResponse.json({ error: "Email service not configured." }, { status: 503 });
+    }
 
-    await resend.emails.send({
-      from: `${SITE_NAME} <${from}>`,
+    const name = body.name.trim();
+    const email = body.email.trim();
+    const message = body.message.trim();
+    const company = body.company?.trim() || "N/A";
+    const country = body.country?.trim() || "N/A";
+    const researchInterest = body.researchInterest?.trim() || "N/A";
+    const productName = body.productName?.trim();
+    const productLine = productName
+      ? `<p><b>Product:</b> ${escapeHtml(productName)}</p>`
+      : "";
+
+    const fromUser = process.env.EMAIL_USER || SITE_EMAIL;
+
+    await transporter.sendMail({
+      from: `${SITE_NAME} <${fromUser}>`,
       to: SITE_EMAIL,
-      replyTo: body.email,
+      replyTo: email,
       subject: "New Inquiry - Acuris Science",
-      html: `<h2>New Inquiry</h2>${product}<p><b>Name:</b> ${body.name}</p><p><b>Company:</b> ${body.company || "N/A"}</p><p><b>Email:</b> ${body.email}</p><p><b>Country:</b> ${body.country || "N/A"}</p>${interest}<p><b>Message:</b></p><p>${body.message}</p>`,
+      html: `<h2>New Inquiry</h2>${productLine}<p><b>Name:</b> ${escapeHtml(name)}</p><p><b>Company:</b> ${escapeHtml(company)}</p><p><b>Email:</b> ${escapeHtml(email)}</p><p><b>Country:</b> ${escapeHtml(country)}</p><p><b>Research Interest:</b> ${escapeHtml(researchInterest)}</p><p><b>Message:</b></p><p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>`,
     });
+
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Failed to send inquiry." }, { status: 500 });

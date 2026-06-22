@@ -39,7 +39,7 @@ export function InquiryForm({ productName }: { productName?: string }) {
   if (status === "ok") {
     return (
       <div className="rounded-lg border border-border p-6 text-center">
-        <p className="font-medium text-primary">Thank you. We will respond shortly.</p>
+        <p className="font-medium text-primary">Thank you for your inquiry. Our team will contact you within 24 hours.</p>
         <button type="button" className="mt-3 text-sm text-brand" onClick={() => setStatus("idle")}>Send another</button>
       </div>
     );
