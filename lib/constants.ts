@@ -1,6 +1,13 @@
 export const SITE_NAME = "Acuris Science";
-export const SITE_URL = "https://www.acurisscience.com";
+export const CANONICAL_HOST = "www.acurisscience.com";
+export const SITE_URL = `https://${CANONICAL_HOST}`;
 export const SITE_EMAIL = "sales@acurisscience.com";
+
+/** Absolute URL on the canonical https://www origin. */
+export function siteUrl(path = ""): string {
+  if (!path || path === "/") return SITE_URL;
+  return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+}
 
 export const NAV = [
   { href: "/", label: "Home" },
@@ -18,15 +25,6 @@ export const RESEARCH_INTERESTS = [
   "Custom Synthesis",
   "Analytical Standards",
   "Bulk Supply",
-] as const;
-
-export const FEATURED_PEPTIDE_SLUGS = [
-  "tirzepatide",
-  "semaglutide",
-  "retatrutide",
-  "cagrilintide",
-  "tesamorelin",
-  "bpc-157",
 ] as const;
 
 export const HOME_WHY_CHOOSE = [
@@ -174,16 +172,65 @@ export const QUALITY_ASSURANCE_ITEMS = [
   "Research Grade Quality",
 ] as const;
 
+export const PRODUCT_CATEGORIES = [
+  "GLP-1 / Metabolic Peptides",
+  "Growth Hormone & Recovery Peptides",
+  "Cognitive / Nootropic Peptides",
+  "Cosmetic / Anti-aging Peptides",
+  "Research / Regenerative Peptides",
+] as const;
+
 export const CATEGORY_SLUG_MAP: Record<string, string> = {
-  "Growth Hormone Peptides": "growth-hormone-peptides",
-  "GLP-1 Related Peptides": "glp-1-related-peptides",
-  "Research Peptides": "research-peptides",
-  "Cosmetic Peptides": "cosmetic-peptides",
+  "GLP-1 / Metabolic Peptides": "glp1",
+  "Growth Hormone & Recovery Peptides": "growth-hormone",
+  "Cognitive / Nootropic Peptides": "nootropic",
+  "Cosmetic / Anti-aging Peptides": "cosmetic",
+  "Research / Regenerative Peptides": "research",
 };
 
 export const SLUG_CATEGORY_MAP = Object.fromEntries(
   Object.entries(CATEGORY_SLUG_MAP).map(([n, s]) => [s, n])
 );
+
+export const CATEGORY_PATH_MAP: Record<string, string> = Object.fromEntries(
+  Object.entries(CATEGORY_SLUG_MAP).map(([name, slug]) => [name, `/peptides/${slug}`])
+);
+
+export const CATEGORY_SEO: Record<
+  (typeof PRODUCT_CATEGORIES)[number],
+  { title: string; description: string; path: string }
+> = {
+  "GLP-1 / Metabolic Peptides": {
+    title: "GLP-1 Metabolic Peptides for research supply",
+    description:
+      "Research-grade GLP-1 and metabolic peptides including tirzepatide, semaglutide, and retatrutide for laboratory studies.",
+    path: "/peptides/glp1",
+  },
+  "Growth Hormone & Recovery Peptides": {
+    title: "Growth Hormone & Recovery Peptides for research supply",
+    description:
+      "GH secretagogues and recovery peptides including ipamorelin, tesamorelin, and TB-500 for endocrine and regenerative research.",
+    path: "/peptides/growth-hormone",
+  },
+  "Cognitive / Nootropic Peptides": {
+    title: "Cognitive Nootropic Peptides for research supply",
+    description:
+      "Neuropeptides including selank, semax, and epitalon for cognitive neuroscience and nootropic mechanism research.",
+    path: "/peptides/nootropic",
+  },
+  "Cosmetic / Anti-aging Peptides": {
+    title: "Cosmetic Anti-aging Peptides for research supply",
+    description:
+      "Dermatological research peptides including GHK-Cu, Matrixyl 3000, and Snap-8 for cosmetic and anti-aging studies.",
+    path: "/peptides/cosmetic",
+  },
+  "Research / Regenerative Peptides": {
+    title: "Research Regenerative Peptides for research supply",
+    description:
+      "Regenerative research peptides including BPC-157, SS-31, and PT-141 for tissue repair and specialty signaling studies.",
+    path: "/peptides/research",
+  },
+};
 
 export const DISCLAIMER =
   "For laboratory research use only. Products are not intended for human consumption, therapeutic use or diagnostic procedures.";

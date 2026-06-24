@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Footer, Header } from "@/components/layout";
 import { JsonLd } from "@/components/ui";
 import { globalSchemas } from "@/lib/seo";
+import { siteUrl } from "@/lib/constants";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -10,7 +11,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 export const metadata: Metadata = {
   title: { default: "Research Grade Peptide Supplier | Acuris Science", template: "%s | Acuris Science" },
   description: "Research-grade peptides with COA, LC-MS, HPLC and NMR documentation for pharma, biotech and academic research.",
-  metadataBase: new URL("https://www.acurisscience.com"),
+  metadataBase: new URL(siteUrl()),
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -1,19 +1,19 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { InquiryForm } from "@/components/InquiryForm";
-import { JsonLd } from "@/components/ui";
-import { formatCas, getProduct, products } from "@/data/products";
-import { breadcrumbSchema, meta, productSchema } from "@/lib/seo";
+import { ProductContentSections } from "@/components/ProductContentSections";
+import { ProductSEO, generateProductPageMetadata } from "@/components/ProductSEO";
+import { ProductFAQ } from "@/components/seo/ProductFAQ";
+import { RelatedPeptides } from "@/components/seo/RelatedPeptides";
+import { formatCas, getProduct, getProductSlugs } from "@/data/products";
 
 export async function generateStaticParams() {
-  return products.map((p) => ({ slug: p.slug }));
+  return getProductSlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const p = getProduct(slug);
-  if (!p) return { title: "Not Found" };
-  return meta({ title: `${p.name} | Research Peptide`, description: p.description, path: `/peptides/${slug}` });
+  return generateProductPageMetadata(slug);
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -33,10 +33,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="bg-white">
-      <JsonLd data={[productSchema(p), breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Products", path: "/peptides" }, { name: p.name, path: `/peptides/${slug}` }])]} />
+      <ProductSEO product={p} />
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <nav className="mb-6 text-sm text-muted">
-          <Link href="/" className="hover:text-brand">Home</Link> / <Link href="/peptides" className="hover:text-brand">Products</Link> / {p.name}
+          <Link href="/" className="hover:text-brand">Home</Link> / <Link href="/peptides" className="hover:text-brand">Peptides</Link> / {p.name}
         </nav>
         <div className="grid gap-10 lg:grid-cols-2">
           <div>
@@ -69,6 +69,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </div>
         </div>
       </div>
+      <ProductContentSections product={p} />
+      <ProductFAQ product={p} />
+      <RelatedPeptides product={p} />
     </div>
   );
 }

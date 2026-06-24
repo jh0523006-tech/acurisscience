@@ -1,19 +1,30 @@
 import type { MetadataRoute } from "next";
-import { products } from "@/data/products";
-import { SITE_URL } from "@/lib/constants";
+import { getProductSlugs } from "@/data/products";
+import { CATEGORY_SEO, siteUrl } from "@/lib/constants";
+
+const STATIC_PATHS = ["", "/peptides", "/services", "/about", "/contact"] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticPages = ["", "/peptides", "/services", "/about", "/contact"].map((p) => ({
-    url: `${SITE_URL}${p}`,
+  const staticPages = STATIC_PATHS.map((path) => ({
+    url: siteUrl(path),
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
-    priority: p === "" ? 1 : 0.8,
+    priority: path === "" ? 1 : 0.8,
   }));
-  const productPages = products.map((p) => ({
-    url: `${SITE_URL}/peptides/${p.slug}`,
+
+  const categoryPages = Object.values(CATEGORY_SEO).map((category) => ({
+    url: siteUrl(category.path),
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.75,
+  }));
+
+  const productPages = getProductSlugs().map((slug) => ({
+    url: siteUrl(`/peptides/${slug}`),
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
-  return [...staticPages, ...productPages];
+
+  return [...staticPages, ...categoryPages, ...productPages];
 }

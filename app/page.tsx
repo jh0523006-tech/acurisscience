@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { SearchBar } from "@/components/SearchBar";
 import { Section } from "@/components/ui";
-import { formatCas, getProduct } from "@/data/products";
-import { FEATURED_PEPTIDE_SLUGS, HOME_WHY_CHOOSE } from "@/lib/constants";
+import { formatCas, getFeaturedProducts } from "@/data/products";
+import { HOME_WHY_CHOOSE } from "@/lib/constants";
 import { meta } from "@/lib/seo";
 import { LabImage } from "@/components/LabImage";
 
@@ -13,9 +13,7 @@ export const metadata = meta({
   path: "/",
 });
 
-const featuredPeptides = FEATURED_PEPTIDE_SLUGS.map((slug) => getProduct(slug)).filter(
-  (product): product is NonNullable<typeof product> => Boolean(product)
-);
+const featuredPeptides = getFeaturedProducts();
 
 export default function HomePage() {
   return (
