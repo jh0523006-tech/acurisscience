@@ -6,6 +6,8 @@ import { ProductSEO, generateProductPageMetadata } from "@/components/ProductSEO
 import { ProductFAQ } from "@/components/seo/ProductFAQ";
 import { RelatedPeptides } from "@/components/seo/RelatedPeptides";
 import { formatCas, getProduct, getProductSlugs } from "@/data/products";
+import { getCategoryBreadcrumbLabel, getCategoryPath } from "@/lib/internalLinks";
+import { getBackToCategoryText, getProductH1, getProductSeoIntro } from "@/lib/product-seo";
 
 export async function generateStaticParams() {
   return getProductSlugs().map((slug) => ({ slug }));
@@ -22,6 +24,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   if (!p) notFound();
 
   const docs = ["COA", "LC-MS", "HPLC", "NMR"];
+  const categoryHref = getCategoryPath(p.category);
+  const categoryLabel = getCategoryBreadcrumbLabel(p.category);
   const info = [
     ["CAS", formatCas(p.cas)],
     ["Molecular Formula", p.molecularFormula],
@@ -35,14 +39,32 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     <div className="bg-white">
       <ProductSEO product={p} />
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <nav className="mb-6 text-sm text-muted">
-          <Link href="/" className="hover:text-brand">Home</Link> / <Link href="/peptides" className="hover:text-brand">Peptides</Link> / {p.name}
+        <nav className="mb-6 text-sm text-muted" aria-label="Breadcrumb">
+          <Link href="/" className="hover:text-brand">Home</Link>
+          {" / "}
+          <Link href="/peptides" className="hover:text-brand">Research Peptides Catalog</Link>
+          {categoryHref && (
+            <>
+              {" / "}
+              <Link href={categoryHref} className="hover:text-brand">
+                {categoryLabel}
+              </Link>
+            </>
+          )}
+          {" / "}
+          <span className="text-primary">{p.name}</span>
         </nav>
+        {categoryHref && (
+          <p className="mb-6 text-sm">
+            <Link href={categoryHref} className="font-medium text-brand hover:underline">
+              {getBackToCategoryText(p.category)}
+            </Link>
+          </p>
+        )}
         <div className="grid gap-10 lg:grid-cols-2">
           <div>
-            <h1 className="text-3xl font-semibold text-primary">{p.name}</h1>
-            <p className="mt-2 text-sm text-muted">{p.category}</p>
-            <p className="mt-4 text-muted leading-relaxed">{p.description}</p>
+            <h1 className="text-3xl font-semibold text-primary">{getProductH1(p)}</h1>
+            <p className="mt-4 max-w-2xl text-muted leading-relaxed">{getProductSeoIntro(p)}</p>
             <dl className="mt-8 divide-y divide-border rounded-xl border border-border">
               {info.map(([k, v]) => (
                 <div key={k} className="grid grid-cols-2 gap-4 px-4 py-3 sm:grid-cols-3">
@@ -52,7 +74,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               ))}
             </dl>
             <div className="mt-8">
-              <h2 className="text-lg font-semibold text-primary">Documents</h2>
+              <h2 className="text-lg font-semibold text-primary">Analytical Documentation</h2>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 {docs.map((d) => (
                   <div key={d} className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
@@ -64,7 +86,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             </div>
           </div>
           <div className="rounded-xl border border-border bg-blue-50/30 p-6 lg:sticky lg:top-24">
-            <h2 className="text-lg font-semibold text-primary">Product Inquiry</h2>
+            <h2 className="text-lg font-semibold text-primary">Research Inquiry</h2>
             <div className="mt-4"><InquiryForm productName={p.name} /></div>
           </div>
         </div>

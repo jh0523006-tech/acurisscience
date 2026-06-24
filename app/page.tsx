@@ -3,6 +3,12 @@ import { SearchBar } from "@/components/SearchBar";
 import { Section } from "@/components/ui";
 import { formatCas, getFeaturedProducts } from "@/data/products";
 import { HOME_WHY_CHOOSE } from "@/lib/constants";
+import {
+  getCategoryPath,
+  getProductLinkText,
+  getProductSeoTitle,
+  HOMEPAGE_CATEGORY_LINKS,
+} from "@/lib/internalLinks";
 import { meta } from "@/lib/seo";
 import { LabImage } from "@/components/LabImage";
 
@@ -53,7 +59,7 @@ export default function HomePage() {
                 href="/peptides"
                 className="rounded-md bg-white px-6 py-3 text-sm font-medium text-brand-dark hover:bg-slate-100"
               >
-                Browse Products
+                Browse Research Peptides Catalog
               </Link>
               <Link
                 href="/contact"
@@ -76,6 +82,31 @@ export default function HomePage() {
       </section>
 
       <Section>
+        <h2 className="text-2xl font-semibold text-primary">Research Peptide Categories</h2>
+        <p className="mt-3 max-w-2xl text-sm text-muted">
+          Explore research-grade peptides organized by therapeutic area and signaling pathway.
+        </p>
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {HOMEPAGE_CATEGORY_LINKS.map((item) => {
+            const href = getCategoryPath(item.category);
+            if (!href) return null;
+
+            return (
+            <Link
+              key={item.category}
+              href={href}
+              className="group flex flex-col rounded-xl border border-border bg-white p-6 shadow-sm transition hover:border-brand hover:shadow-lg"
+            >
+              <h3 className="text-lg font-semibold text-primary group-hover:text-brand">{item.title}</h3>
+              <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">{item.description}</p>
+              <span className="mt-5 text-sm font-medium text-brand">{item.anchor} →</span>
+            </Link>
+            );
+          })}
+        </div>
+      </Section>
+
+      <Section>
         <h2 className="text-2xl font-semibold text-primary">Featured Products</h2>
         <div className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {featuredPeptides.map((product) => (
@@ -85,7 +116,7 @@ export default function HomePage() {
             >
               <Link href={`/peptides/${product.slug}`} className="group flex-1">
                 <h3 className="text-xl font-semibold text-primary group-hover:text-brand">
-                  {product.name}
+                  {getProductSeoTitle(product)}
                 </h3>
                 <dl className="mt-5 space-y-3 text-sm">
                   <div className="flex justify-between gap-4 border-b border-border/70 pb-3">
@@ -101,6 +132,9 @@ export default function HomePage() {
                     <dd className="text-right font-medium text-primary">{product.category}</dd>
                   </div>
                 </dl>
+                <span className="mt-5 inline-block text-sm font-medium text-brand group-hover:underline">
+                  {getProductLinkText(product)} →
+                </span>
               </Link>
               <Link
                 href={`/contact?product=${encodeURIComponent(product.name)}`}

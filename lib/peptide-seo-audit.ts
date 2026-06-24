@@ -53,19 +53,30 @@ function hasProductJsonLd(slug: string) {
   const product = getProduct(slug);
   if (!product) return false;
   const schema = productSchema(product);
-  const about = schema.about as { name?: string } | undefined;
+  const brand = schema.brand as { name?: string } | undefined;
+  const forbiddenFields = [
+    "offers",
+    "aggregateRating",
+    "price",
+    "priceSpecification",
+    "shippingDetails",
+    "hasMerchantReturnPolicy",
+  ] as const;
+
   return (
-    schema["@type"] === "ScholarlyArticle" &&
+    schema["@type"] === "Product" &&
     schema.name === product.name &&
+    schema.sku === product.slug &&
     schema.url === siteUrl(`/peptides/${slug}`) &&
-    !("offers" in schema) &&
-    !("aggregateRating" in schema) &&
-    schema.author?.name === SITE_NAME &&
-    about?.name === product.name &&
-    Boolean(schema.additionalProperty?.some((p: { name?: string }) => p.name === "Intended Use")) &&
-    Boolean(
-      schema.additionalProperty?.some((p: { name?: string }) => p.name === "CAS Registry Number")
-    )
+    schema.category === "Research Peptide" &&
+    brand?.name === SITE_NAME &&
+    forbiddenFields.every((field) => !(field in schema)) &&
+    Boolean(schema.additionalProperty?.some((p: { name?: string; value?: string }) => p.name === "Intended Use" && p.value === "Research Use Only / Inquiry Based Supply")) &&
+    (product.cas
+      ? Boolean(
+          schema.additionalProperty?.some((p: { name?: string }) => p.name === "CAS Registry Number")
+        )
+      : !schema.additionalProperty?.some((p: { name?: string }) => p.name === "CAS Registry Number"))
   );
 }
 

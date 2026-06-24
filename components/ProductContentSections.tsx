@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 import type { Product } from "@/data/products";
 import { getProductContent } from "@/data/product-content";
+import { ProductEntityCrossLinks } from "@/components/seo/ProductEntityCrossLinks";
 
-function ContentBlock({ title, children }: { title: string; children: ReactNode }) {
+function SectionBlock({ title, children }: { title: string; children: ReactNode }) {
   return (
     <article className="rounded-xl border border-border bg-white p-6 sm:p-8">
       <h2 className="text-xl font-semibold text-primary">{title}</h2>
@@ -17,41 +18,32 @@ export function ProductContentSections({ product }: { product: Product }) {
   return (
     <section className="border-t border-border bg-slate-50/50 py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-brand">Research Documentation</p>
-        <h2 className="text-2xl font-semibold text-primary">Scientific Profile — {product.name}</h2>
-        <p className="mt-3 max-w-3xl text-sm text-muted">
-          For laboratory research use only. The following sections summarize published mechanistic frameworks
-          and common investigational applications; they do not constitute medical guidance.
-        </p>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <SectionBlock title="Overview">
+            <p>{content.overview.whatItIs}</p>
+            <ProductEntityCrossLinks product={product} />
+          </SectionBlock>
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-2">
-          <ContentBlock title="Scientific Overview">
-            <div>
-              <h3 className="font-medium text-primary">What is {product.name}?</h3>
-              <p className="mt-2">{content.overview.whatItIs}</p>
-            </div>
-            <div>
-              <h3 className="font-medium text-primary">Mechanism of Action</h3>
-              <p className="mt-2">{content.overview.mechanism}</p>
-            </div>
+          <SectionBlock title="Mechanism of Action">
+            <p>{content.overview.mechanism}</p>
             {content.overview.receptors && (
               <div>
                 <h3 className="font-medium text-primary">Receptor Binding &amp; Signaling</h3>
                 <p className="mt-2">{content.overview.receptors}</p>
               </div>
             )}
-          </ContentBlock>
+          </SectionBlock>
 
-          <ContentBlock title="Research Applications">
+          <SectionBlock title="Research Applications">
             {content.researchApplications.map((app) => (
               <div key={app.title}>
                 <h3 className="font-medium text-primary">{app.title}</h3>
                 <p className="mt-2">{app.description}</p>
               </div>
             ))}
-          </ContentBlock>
+          </SectionBlock>
 
-          <ContentBlock title="Molecular Information">
+          <SectionBlock title="Molecular Information">
             {content.molecular.chainSummary && (
               <div>
                 <h3 className="font-medium text-primary">Sequence &amp; Chain Summary</h3>
@@ -82,9 +74,9 @@ export function ProductContentSections({ product }: { product: Product }) {
                 <dd className="font-medium text-primary">{product.purity}</dd>
               </div>
             </dl>
-          </ContentBlock>
+          </SectionBlock>
 
-          <ContentBlock title="Experimental Notes">
+          <SectionBlock title="Experimental Notes">
             <div>
               <h3 className="font-medium text-primary">Stability</h3>
               <p className="mt-2">{content.experimental.stability}</p>
@@ -97,7 +89,7 @@ export function ProductContentSections({ product }: { product: Product }) {
               <h3 className="font-medium text-primary">Laboratory Handling</h3>
               <p className="mt-2">{content.experimental.handling}</p>
             </div>
-          </ContentBlock>
+          </SectionBlock>
         </div>
       </div>
     </section>

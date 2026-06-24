@@ -201,33 +201,33 @@ export const CATEGORY_SEO: Record<
   { title: string; description: string; path: string }
 > = {
   "GLP-1 / Metabolic Peptides": {
-    title: "GLP-1 Metabolic Peptides for research supply",
+    title: "GLP-1 Metabolic Peptides | Research Peptide Catalog",
     description:
-      "Research-grade GLP-1 and metabolic peptides including tirzepatide, semaglutide, and retatrutide for laboratory studies.",
+      "Research-grade GLP-1 and metabolic peptides including tirzepatide, semaglutide, and retatrutide for laboratory metabolic research. COA and analytical documentation available.",
     path: "/peptides/glp1",
   },
   "Growth Hormone & Recovery Peptides": {
-    title: "Growth Hormone & Recovery Peptides for research supply",
+    title: "Growth Hormone Peptides | Research Peptide Catalog",
     description:
-      "GH secretagogues and recovery peptides including ipamorelin, tesamorelin, and TB-500 for endocrine and regenerative research.",
+      "Growth hormone secretagogue and recovery peptides including ipamorelin, tesamorelin, and TB-500 for endocrine and tissue research. Laboratory use only.",
     path: "/peptides/growth-hormone",
   },
   "Cognitive / Nootropic Peptides": {
-    title: "Cognitive Nootropic Peptides for research supply",
+    title: "Nootropic Peptides | Research Peptide Catalog",
     description:
-      "Neuropeptides including selank, semax, and epitalon for cognitive neuroscience and nootropic mechanism research.",
+      "Cognitive and nootropic research peptides including selank, semax, and epitalon for neuroscience and neuropeptide mechanism studies. For laboratory research use.",
     path: "/peptides/nootropic",
   },
   "Cosmetic / Anti-aging Peptides": {
-    title: "Cosmetic Anti-aging Peptides for research supply",
+    title: "Cosmetic Research Peptides | Anti-aging Peptide Catalog",
     description:
-      "Dermatological research peptides including GHK-Cu, Matrixyl 3000, and Snap-8 for cosmetic and anti-aging studies.",
+      "Cosmetic and dermatological research peptides including GHK-Cu, Matrixyl 3000, and Snap-8 for anti-aging and skin matrix studies. Laboratory research compounds.",
     path: "/peptides/cosmetic",
   },
   "Research / Regenerative Peptides": {
-    title: "Research Regenerative Peptides for research supply",
+    title: "Regenerative Research Peptides | Laboratory Peptide Catalog",
     description:
-      "Regenerative research peptides including BPC-157, SS-31, and PT-141 for tissue repair and specialty signaling studies.",
+      "Regenerative and specialty signaling peptides including BPC-157, SS-31, and PT-141 for tissue repair and receptor pharmacology research. Not for medical use.",
     path: "/peptides/research",
   },
 };

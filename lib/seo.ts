@@ -28,7 +28,8 @@ const CATEGORY_META_SUFFIX: Record<string, string> = {
   "Research / Regenerative Peptides": "Regenerative Research Peptide",
 };
 
-const GLP1_ENTITY_SLUGS = ["semaglutide", "tirzepatide", "retatrutide", "cagrilintide"] as const;
+const PRODUCT_CATEGORY = "Research Peptide";
+const B2B_INTENDED_USE = "Research Use Only / Inquiry Based Supply";
 
 function getCategorySeoKeyword(category: string) {
   return CATEGORY_SEO_KEYWORDS[category] ?? category;
@@ -154,86 +155,33 @@ export const faqSchema = {
   })),
 };
 
-const RESEARCH_DOCUMENTATION_USE =
-  "For laboratory research and scientific documentation use only. Not intended for human consumption, therapeutic use, or diagnostic procedures.";
-
 export function productSchema(
-  p: Pick<
-    Product,
-    | "name"
-    | "description"
-    | "slug"
-    | "cas"
-    | "purity"
-    | "category"
-    | "molecularFormula"
-    | "molecularWeight"
-  >
+  p: Pick<Product, "name" | "description" | "slug" | "cas" | "category">
 ) {
   const url = siteUrl(`/peptides/${p.slug}`);
-  const categoryLabel = getCategorySeoKeyword(p.category);
   const schemaDescription = getProductSchemaDescription(p as Product);
+  const additionalProperty: Array<{ "@type": "PropertyValue"; name: string; value: string }> = [
+    { "@type": "PropertyValue", name: "Intended Use", value: B2B_INTENDED_USE },
+  ];
 
-  const entityRefs = isKeywordLandingPage(p.slug)
-    ? GLP1_ENTITY_SLUGS.filter((slug) => slug !== p.slug)
-        .map((slug) => getProduct(slug))
-        .filter(Boolean)
-        .map((related) => siteUrl(`/peptides/${related!.slug}`))
-    : [];
+  if (p.cas) {
+    additionalProperty.unshift({
+      "@type": "PropertyValue",
+      name: "CAS Registry Number",
+      value: p.cas,
+    });
+  }
 
   return {
     "@context": "https://schema.org",
-    "@type": "ScholarlyArticle",
-    headline: `${p.name} — Research Peptide Documentation`,
+    "@type": "Product",
     name: p.name,
     description: `${schemaDescription} ${DISCLAIMER}`,
+    sku: p.slug,
+    brand: { "@type": "Brand", name: SITE_NAME },
+    category: PRODUCT_CATEGORY,
     url,
-    inLanguage: "en-US",
-    genre: "Research Documentation",
-    keywords: [p.name, categoryLabel, "research peptide", "laboratory research"].join(", "),
-    author: { "@type": "Organization", name: SITE_NAME, url: siteUrl() },
-    publisher: { "@type": "Organization", name: SITE_NAME, url: siteUrl() },
-    audience: {
-      "@type": "Audience",
-      audienceType: "Research scientists and laboratory professionals",
-    },
-    usageInfo: RESEARCH_DOCUMENTATION_USE,
-    about: {
-      "@type": "MolecularEntity",
-      name: p.name,
-      ...(p.cas
-        ? {
-            identifier: {
-              "@type": "PropertyValue",
-              propertyID: "CAS Registry Number",
-              value: p.cas,
-            },
-          }
-        : {}),
-      molecularFormula: p.molecularFormula,
-      ...(p.molecularWeight && p.molecularWeight !== "N/A"
-        ? { molecularMass: p.molecularWeight }
-        : {}),
-    },
-    ...(entityRefs.length > 0
-      ? {
-          mentions: entityRefs.map((refUrl) => ({
-            "@type": "ScholarlyArticle",
-            url: refUrl,
-          })),
-        }
-      : {}),
-    additionalProperty: [
-      {
-        "@type": "PropertyValue",
-        name: "CAS Registry Number",
-        value: p.cas || "Available Upon Request",
-      },
-      { "@type": "PropertyValue", name: "Molecular Formula", value: p.molecularFormula },
-      { "@type": "PropertyValue", name: "Molecular Weight", value: p.molecularWeight },
-      { "@type": "PropertyValue", name: "Analytical Purity", value: p.purity },
-      { "@type": "PropertyValue", name: "Intended Use", value: RESEARCH_DOCUMENTATION_USE },
-    ],
+    additionalProperty,
   };
 }
 

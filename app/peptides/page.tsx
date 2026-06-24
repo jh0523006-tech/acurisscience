@@ -4,6 +4,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { PageHero } from "@/components/sections";
 import { getProductsByCategory } from "@/data/products";
 import { CATEGORY_PATH_MAP, IMAGES, PRODUCT_CATEGORIES } from "@/lib/constants";
+import { getCategoryBrowseAllText } from "@/lib/internalLinks";
 import { meta } from "@/lib/seo";
 
 export const metadata = meta({
@@ -44,13 +45,13 @@ export default function PeptidesPage() {
                 <h2 className="text-2xl font-semibold text-primary">{category}</h2>
                 {categoryHref && (
                   <Link href={categoryHref} className="text-sm font-medium text-brand hover:underline">
-                    View all →
+                    {getCategoryBrowseAllText(category)}
                   </Link>
                 )}
               </div>
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {items.map((p) => (
-                  <ProductCard key={p.slug} product={p} />
+                  <ProductCard key={p.slug} product={p} seoHeading />
                 ))}
               </div>
             </section>
