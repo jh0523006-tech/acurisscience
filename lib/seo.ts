@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
 import type { Product } from "@/data/products";
 import { getProduct } from "@/data/products";
-import { FAQ, SITE_EMAIL, SITE_NAME, siteUrl } from "@/lib/constants";
-
-const PRODUCT_CATEGORY = "Research Peptide";
+import { CATEGORY_PATH_MAP, DISCLAIMER, FAQ, SITE_EMAIL, SITE_NAME, siteUrl } from "@/lib/constants";
+import { getCategorySeoKeyword } from "@/lib/internalLinks";
+import {
+  GLP1_ENTITY_SLUGS,
+  getProductMetaDescription,
+  getProductMetaTitle,
+  getProductSchemaDescription,
+  isKeywordLandingPage,
+} from "@/lib/product-seo";
 
 export function meta({
   title,
@@ -24,17 +30,17 @@ export function meta({
   };
 }
 
-export function productPageTitle(name: string) {
-  return `${name} Research Peptide`;
+export function productPageTitle(product: Product) {
+  return getProductMetaTitle(product);
 }
 
 export function productSeoDescription(product: Product) {
-  return `${product.name} research-grade peptide (${product.purity} purity) from ${SITE_NAME}. ${product.description} Includes COA, LC-MS, HPLC, and NMR documentation for academic, biotech, and pharmaceutical research.`;
+  return getProductMetaDescription(product);
 }
 
 export function generateProductMetadata(product: Product): Metadata {
   const path = `/peptides/${product.slug}`;
-  const title = productPageTitle(product.name);
+  const title = productPageTitle(product);
   const description = productSeoDescription(product);
   const url = siteUrl(path);
 
@@ -100,27 +106,85 @@ export const faqSchema = {
   })),
 };
 
-export function productSchema(p: Pick<Product, "name" | "description" | "slug" | "cas" | "purity">) {
+const RESEARCH_DOCUMENTATION_USE =
+  "For laboratory research and scientific documentation use only. Not intended for human consumption, therapeutic use, or diagnostic procedures.";
+
+export function productSchema(
+  p: Pick<
+    Product,
+    | "name"
+    | "description"
+    | "slug"
+    | "cas"
+    | "purity"
+    | "category"
+    | "molecularFormula"
+    | "molecularWeight"
+  >
+) {
   const url = siteUrl(`/peptides/${p.slug}`);
+  const categoryLabel = getCategorySeoKeyword(p.category);
+  const schemaDescription = getProductSchemaDescription(p as Product);
+
+  const entityRefs = isKeywordLandingPage(p.slug)
+    ? GLP1_ENTITY_SLUGS.filter((slug) => slug !== p.slug)
+        .map((slug) => getProduct(slug))
+        .filter(Boolean)
+        .map((related) => siteUrl(`/peptides/${related!.slug}`))
+    : [];
 
   return {
     "@context": "https://schema.org",
-    "@type": "Product",
+    "@type": "ScholarlyArticle",
+    headline: `${p.name} — Research Peptide Documentation`,
     name: p.name,
-    description: p.description,
+    description: `${schemaDescription} ${DISCLAIMER}`,
     url,
-    sku: p.slug,
-    category: PRODUCT_CATEGORY,
-    brand: { "@type": "Brand", name: SITE_NAME },
-    offers: {
-      "@type": "Offer",
-      url,
-      availability: "https://schema.org/InStock",
-      seller: { "@type": "Organization", name: SITE_NAME },
+    inLanguage: "en-US",
+    genre: "Research Documentation",
+    keywords: [p.name, categoryLabel, "research peptide", "laboratory research"].join(", "),
+    author: { "@type": "Organization", name: SITE_NAME, url: siteUrl() },
+    publisher: { "@type": "Organization", name: SITE_NAME, url: siteUrl() },
+    audience: {
+      "@type": "Audience",
+      audienceType: "Research scientists and laboratory professionals",
     },
+    usageInfo: RESEARCH_DOCUMENTATION_USE,
+    about: {
+      "@type": "MolecularEntity",
+      name: p.name,
+      ...(p.cas
+        ? {
+            identifier: {
+              "@type": "PropertyValue",
+              propertyID: "CAS Registry Number",
+              value: p.cas,
+            },
+          }
+        : {}),
+      molecularFormula: p.molecularFormula,
+      ...(p.molecularWeight && p.molecularWeight !== "N/A"
+        ? { molecularMass: p.molecularWeight }
+        : {}),
+    },
+    ...(entityRefs.length > 0
+      ? {
+          mentions: entityRefs.map((refUrl) => ({
+            "@type": "ScholarlyArticle",
+            url: refUrl,
+          })),
+        }
+      : {}),
     additionalProperty: [
-      { "@type": "PropertyValue", name: "CAS", value: p.cas || "Available Upon Request" },
-      { "@type": "PropertyValue", name: "Purity", value: p.purity },
+      {
+        "@type": "PropertyValue",
+        name: "CAS Registry Number",
+        value: p.cas || "Available Upon Request",
+      },
+      { "@type": "PropertyValue", name: "Molecular Formula", value: p.molecularFormula },
+      { "@type": "PropertyValue", name: "Molecular Weight", value: p.molecularWeight },
+      { "@type": "PropertyValue", name: "Analytical Purity", value: p.purity },
+      { "@type": "PropertyValue", name: "Intended Use", value: RESEARCH_DOCUMENTATION_USE },
     ],
   };
 }
@@ -150,10 +214,35 @@ export function productFaqSchema(items: { q: string; a: string }[]) {
   };
 }
 
-export const productBreadcrumbItems = (product: Pick<Product, "name" | "slug">) => [
+export function categoryPageSchemas(
+  categoryProducts: Product[],
+  faqs: { q: string; a: string }[],
+  breadcrumbItems: { name: string; path: string }[]
+) {
+  return [
+    ...categoryProducts.map((p) => productSchema(p)),
+    productFaqSchema(faqs),
+    breadcrumbSchema(breadcrumbItems),
+  ];
+}
+
+export const categoryBreadcrumbItems = (category: string, categoryPath: string) => [
   { name: "Home", path: "/" },
   { name: "Peptides", path: "/peptides" },
-  { name: product.name, path: `/peptides/${product.slug}` },
+  { name: getCategorySeoKeyword(category), path: categoryPath },
 ];
+
+export const productBreadcrumbItems = (product: Pick<Product, "name" | "slug" | "category">) => {
+  const items: { name: string; path: string }[] = [
+    { name: "Home", path: "/" },
+    { name: "Peptides", path: "/peptides" },
+  ];
+  const categoryPath = CATEGORY_PATH_MAP[product.category];
+  if (categoryPath) {
+    items.push({ name: getCategorySeoKeyword(product.category), path: categoryPath });
+  }
+  items.push({ name: product.name, path: `/peptides/${product.slug}` });
+  return items;
+};
 
 export const globalSchemas = [orgSchema, webSchema, faqSchema];

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getProduct, getProductSlugs, products } from "@/data/products";
-import { siteUrl } from "@/lib/constants";
+import { SITE_NAME, siteUrl } from "@/lib/constants";
 import {
   generateProductMetadata,
   generateProductPageMetadata,
@@ -53,11 +53,19 @@ function hasProductJsonLd(slug: string) {
   const product = getProduct(slug);
   if (!product) return false;
   const schema = productSchema(product);
+  const about = schema.about as { name?: string } | undefined;
   return (
-    schema["@type"] === "Product" &&
+    schema["@type"] === "ScholarlyArticle" &&
     schema.name === product.name &&
     schema.url === siteUrl(`/peptides/${slug}`) &&
-    schema.sku === slug
+    !("offers" in schema) &&
+    !("aggregateRating" in schema) &&
+    schema.author?.name === SITE_NAME &&
+    about?.name === product.name &&
+    Boolean(schema.additionalProperty?.some((p: { name?: string }) => p.name === "Intended Use")) &&
+    Boolean(
+      schema.additionalProperty?.some((p: { name?: string }) => p.name === "CAS Registry Number")
+    )
   );
 }
 
