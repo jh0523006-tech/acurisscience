@@ -77,10 +77,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   <dt className="font-medium text-primary">Chemical Classification:</dt>
                   <dd className="text-muted">Research peptide</dd>
                 </div>
-                <div className="flex flex-wrap gap-x-2">
-                  <dt className="font-medium text-primary">Primary Keyword:</dt>
-                  <dd className="text-muted">{p.name}</dd>
-                </div>
               </dl>
               <p className="mt-3 text-sm">
                 <Link
@@ -91,7 +87,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 </Link>
               </p>
             </section>
-            <p className="mt-4 max-w-2xl text-muted leading-relaxed">{getProductSeoIntro(p)}</p>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted sm:text-base">
+              {getProductSeoIntro(p)}
+            </p>
             <dl className="mt-8 divide-y divide-border rounded-xl border border-border">
               {info.map(([k, v]) => (
                 <div key={k} className="grid grid-cols-2 gap-4 px-4 py-3 sm:grid-cols-3">
@@ -119,8 +117,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         </div>
       </div>
       <ProductContentSections product={p} />
-      <ProductFAQ product={p} />
       <RelatedPeptides product={p} />
+      <ProductFAQ product={p} />
     </div>
   );
 }

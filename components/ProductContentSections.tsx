@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import type { Product } from "@/data/products";
 import { getProductContent } from "@/data/product-content";
-import { ProductEntityCrossLinks } from "@/components/seo/ProductEntityCrossLinks";
 
 function SectionBlock({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -21,7 +20,6 @@ export function ProductContentSections({ product }: { product: Product }) {
         <div className="grid gap-6 lg:grid-cols-2">
           <SectionBlock title="Overview">
             <p>{content.overview.whatItIs}</p>
-            <ProductEntityCrossLinks product={product} />
           </SectionBlock>
 
           <SectionBlock title="Mechanism of Action">
