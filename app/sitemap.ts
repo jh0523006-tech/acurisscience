@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { getProductSlugs } from "@/data/products";
 import { CATEGORY_SEO, siteUrl } from "@/lib/constants";
 
-const STATIC_PATHS = ["", "/peptides", "/services", "/about", "/contact"] as const;
+const STATIC_PATHS = ["", "/peptides", "/services", "/about", "/contact", "/cas-search"] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = STATIC_PATHS.map((path) => ({

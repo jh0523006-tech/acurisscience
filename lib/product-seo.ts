@@ -1,4 +1,5 @@
 import type { Product } from "@/data/products";
+import { formatCas } from "@/data/products";
 import { getCategorySeoKeyword, getProductFunctionKeyword } from "@/lib/internalLinks";
 
 /** Slugs upgraded to keyword-first ranking landing pages. */
@@ -112,10 +113,7 @@ export function getProductMetaTitle(product: Product): string {
 }
 
 export function getProductH1(product: Product): string {
-  const primary = getProductPrimaryKeyword(product);
-  if (primary) return primary;
-  const short = getCategoryShortLabel(product.category);
-  return `${product.name} ${short} Research Peptide`;
+  return `${product.name} | CAS: ${formatCas(product.cas)}`;
 }
 
 export function getProductSeoIntro(product: Product): string {

@@ -64,6 +64,33 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <div className="grid gap-10 lg:grid-cols-2">
           <div>
             <h1 className="text-3xl font-semibold text-primary">{getProductH1(p)}</h1>
+            <section
+              className="mt-4 rounded-xl border border-border bg-slate-50/80 px-4 py-4 sm:px-5"
+              aria-label="Product identity"
+            >
+              <dl className="space-y-2 text-sm">
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="font-medium text-primary">CAS Number:</dt>
+                  <dd className="text-muted">{formatCas(p.cas)}</dd>
+                </div>
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="font-medium text-primary">Chemical Classification:</dt>
+                  <dd className="text-muted">Research peptide</dd>
+                </div>
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="font-medium text-primary">Primary Keyword:</dt>
+                  <dd className="text-muted">{p.name}</dd>
+                </div>
+              </dl>
+              <p className="mt-3 text-sm">
+                <Link
+                  href={p.cas.trim() ? `/cas-search?q=${encodeURIComponent(p.cas.trim())}` : "/cas-search"}
+                  className="font-medium text-brand hover:underline"
+                >
+                  Search related CAS →
+                </Link>
+              </p>
+            </section>
             <p className="mt-4 max-w-2xl text-muted leading-relaxed">{getProductSeoIntro(p)}</p>
             <dl className="mt-8 divide-y divide-border rounded-xl border border-border">
               {info.map(([k, v]) => (
