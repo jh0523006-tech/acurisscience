@@ -2,14 +2,62 @@ import type { Metadata } from "next";
 import type { Product } from "@/data/products";
 import { getProduct } from "@/data/products";
 import { CATEGORY_PATH_MAP, DISCLAIMER, FAQ, SITE_EMAIL, SITE_NAME, siteUrl } from "@/lib/constants";
-import { getCategorySeoKeyword } from "@/lib/internalLinks";
-import {
-  GLP1_ENTITY_SLUGS,
-  getProductMetaDescription,
-  getProductMetaTitle,
-  getProductSchemaDescription,
-  isKeywordLandingPage,
-} from "@/lib/product-seo";
+
+const CATEGORY_SEO_KEYWORDS: Record<string, string> = {
+  "GLP-1 / Metabolic Peptides": "GLP-1 Metabolic Peptides",
+  "Growth Hormone & Recovery Peptides": "Growth Hormone Peptides",
+  "Cognitive / Nootropic Peptides": "Nootropic Peptides",
+  "Cosmetic / Anti-aging Peptides": "Cosmetic Anti-aging Peptides",
+  "Research / Regenerative Peptides": "Research Regenerative Peptides",
+};
+
+const KEYWORD_LANDING_SLUGS = ["tirzepatide", "semaglutide", "retatrutide"] as const;
+type KeywordLandingSlug = (typeof KEYWORD_LANDING_SLUGS)[number];
+
+const PRIMARY_KEYWORDS: Record<KeywordLandingSlug, string> = {
+  tirzepatide: "Tirzepatide peptide",
+  semaglutide: "Semaglutide GLP-1 peptide",
+  retatrutide: "Retatrutide metabolic peptide",
+};
+
+const CATEGORY_META_SUFFIX: Record<string, string> = {
+  "GLP-1 / Metabolic Peptides": "GLP-1 Metabolic Research Peptide",
+  "Growth Hormone & Recovery Peptides": "Growth Hormone Research Peptide",
+  "Cognitive / Nootropic Peptides": "Nootropic Research Peptide",
+  "Cosmetic / Anti-aging Peptides": "Cosmetic Research Peptide",
+  "Research / Regenerative Peptides": "Regenerative Research Peptide",
+};
+
+const GLP1_ENTITY_SLUGS = ["semaglutide", "tirzepatide", "retatrutide", "cagrilintide"] as const;
+
+function getCategorySeoKeyword(category: string) {
+  return CATEGORY_SEO_KEYWORDS[category] ?? category;
+}
+
+function isKeywordLandingPage(slug: string): slug is KeywordLandingSlug {
+  return (KEYWORD_LANDING_SLUGS as readonly string[]).includes(slug);
+}
+
+function getProductMetaTitle(product: Product) {
+  const suffix = CATEGORY_META_SUFFIX[product.category] ?? "Research Peptide";
+  const primary = isKeywordLandingPage(product.slug) ? PRIMARY_KEYWORDS[product.slug] : undefined;
+  if (primary) return `${primary} | ${suffix}`;
+  return `${product.name} | ${suffix}`;
+}
+
+function getProductMetaDescription(product: Product) {
+  const primary = isKeywordLandingPage(product.slug) ? PRIMARY_KEYWORDS[product.slug] : undefined;
+  if (primary) {
+    return `${primary} for laboratory research. ${product.description} Research-grade compound (${product.purity} purity) with COA, LC-MS, HPLC, and NMR documentation for academic, biotech, and pharmaceutical metabolic research. Not intended for medical or therapeutic use.`;
+  }
+  return `${product.name} is a research peptide for laboratory research. ${product.description} Research-grade compound (${product.purity} purity) with COA, LC-MS, HPLC, and NMR documentation for academic, biotech, and pharmaceutical research. Not intended for medical or therapeutic use.`;
+}
+
+function getProductSchemaDescription(product: Product) {
+  const primary = isKeywordLandingPage(product.slug) ? PRIMARY_KEYWORDS[product.slug] : undefined;
+  if (primary) return `${primary}: ${product.description}`;
+  return product.description;
+}
 
 export function meta({
   title,
